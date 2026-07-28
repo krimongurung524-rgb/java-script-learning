@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <style> 
+        .colour {
+            background-color: blue;
+            padding: 20px;
+        }
+    </style>
+<div class = "colour">
+    <h1 id = "krimon"> Krimon Gurung </h1>
+    <p> Hi my name is krimon gurung and i am 21 years old currently learning java script</p>
+    <button id = "btn">Enter</button>
+</div>
+<script>
+    const krimon = document.getElementById("krimon")
+    const outer_div = document.getElementsByClassName("colour")
+
+    console.log(outer_div)
+    outer_div[0].addEventListener("mouseenter",function(){
+        krimon.textContent="Krimon is king and i will be right back"
+    })
+
+    const inner_div = document.getElementsByClassName("colour")
+    inner_div[0].addEventListener("mouseleave",function(){
+        krimon.textContent="Krimon is back"
+    })
+
+    const button = document.getElementById("btn");
+    btn.addEventListener("click", function(){
+        window.location.href = "index.html";
+    });
+
+
+    
+</script>
+</body>
+</html>

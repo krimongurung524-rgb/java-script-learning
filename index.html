@@ -12,6 +12,15 @@
     </style>
 </head>
 <body>
+    <style>
+        #click {
+          margin-top: 10px;
+
+        }
+
+    </style>
+
+    <div>
     <h1 id="title">asfsdfa</h1>
     <p id = "Description"> This is normal description</p>
     <button id="btn1">Touch me to change heading</button>
@@ -21,8 +30,8 @@
     <p id="mouse">what mouse is doing</p>
 
     <div id="event" style="height: 100px; width: 100px; background-color: #ff0000;"></div>
-
-
+     <button id = "click">Enter</button>
+</div>
     <script>
         const heading = document.getElementById("title");
 
@@ -55,6 +64,11 @@
             mouse.textContent = "mouse is out"
         })
 
+
+        const click = document.getElementById("click");
+        click.addEventListener("click", function(){
+          window.location.href = "learning.html";
+        });
 
 
 
