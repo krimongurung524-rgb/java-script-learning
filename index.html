@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #event{
+            height: 30px;
+        }
+
+    </style>
+</head>
+<body>
+    <h1 id="title">asfsdfa</h1>
+    <p id = "Description"> This is normal description</p>
+    <button id="btn1">Touch me to change heading</button>
+    <button id="btn2" class="button">Touch me to change paragraph</button>
+
+
+    <p id="mouse">what mouse is doing</p>
+
+    <div id="event" style="height: 100px; width: 100px; background-color: #ff0000;"></div>
+
+
+    <script>
+        const heading = document.getElementById("title");
+
+        
+        const button = document.getElementById("btn1");
+        
+        button.addEventListener("click", function (){
+            heading.textContent  ="Krimon"
+        }        )
+        
+        const paragraph = document.getElementById("Description");
+        const button2 = document.getElementById("btn2")
+
+        button2.addEventListener("click", 
+        function (){
+            paragraph.textContent="Paragraph has been changed"
+        }
+        
+        )
+
+        const mouse = document.getElementById("mouse")
+        const event = document.getElementById("event")
+
+
+        event.addEventListener("mouseenter", function(){
+        mouse.textContent = "mouse is entered"
+        })
+
+        event.addEventListener("mouseleave", function(){
+            mouse.textContent = "mouse is out"
+        })
+
+
+
+
+    </script>
+</body>
+</html>
