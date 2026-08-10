@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>For You</title>
+<style>
+  :root{
+    --plum: #2b1330;
+    --plum-deep: #1a0b1f;
+    --rose: #e8879a;
+    --rose-soft: #f4c9d1;
+    --gold: #d9a441;
+    --cream: #fbeee2;
+    --serif: 'Georgia', 'Iowan Old Style', 'Palatino Linotype', serif;
+    --sans: 'Helvetica Neue', Arial, sans-serif;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{
+    height:100%;
+    background: radial-gradient(ellipse at top, var(--plum) 0%, var(--plum-deep) 70%);
+    font-family: var(--sans);
+    overflow-x:hidden;
+    color: var(--cream);
+  }
+  #canvas{
+    position:fixed; top:0; left:0; width:100%; height:100%;
+    z-index:0; pointer-events:none;
+  }
+  .wrap{
+    position:relative;
+    z-index:1;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding: 40px 20px;
+  }
+  .eyebrow{
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    font-size: 12px;
+    color: var(--gold);
+    margin-bottom: 18px;
+    opacity: 0.85;
+  }
+  h1{
+    font-family: var(--serif);
+    font-weight: 400;
+    font-style: italic;
+    font-size: clamp(32px, 6vw, 58px);
+    line-height: 1.2;
+    color: var(--rose-soft);
+    max-width: 720px;
+    margin-bottom: 14px;
+  }
+  h1 .name{
+    color: var(--gold);
+    font-style: normal;
+  }
+  p.sub{
+    font-size: 16px;
+    color: var(--cream);
+    opacity: 0.75;
+    max-width: 480px;
+    margin-bottom: 40px;
+  }
+  button.reveal-btn{
+    background: transparent;
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    padding: 14px 34px;
+    font-size: 14px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: all 0.35s ease;
+    font-family: var(--sans);
+  }
+  button.reveal-btn:hover{
+    background: var(--gold);
+    color: var(--plum-deep);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(217,164,65,0.35);
+  }
+  button.reveal-btn:focus-visible{
+    outline: 2px solid var(--rose-soft);
+    outline-offset: 3px;
+  }
+
+  .reasons{
+    margin-top: 50px;
+    max-width: 560px;
+    width: 100%;
+    display: none;
+  }
+  .reasons.show{
+    display: block;
+    animation: fadeUp 0.7s ease both;
+  }
+  @keyframes fadeUp{
+    from{opacity:0; transform: translateY(18px);}
+    to{opacity:1; transform: translateY(0);}
+  }
+  .reason-item{
+    font-family: var(--serif);
+    font-size: 18px;
+    color: var(--cream);
+    border-top: 1px solid rgba(232,135,154,0.25);
+    padding: 18px 8px;
+    text-align: left;
+    opacity: 0;
+    display:flex;
+    gap: 16px;
+    align-items: baseline;
+  }
+  .reason-item.in{
+    animation: fadeUp 0.6s ease forwards;
+  }
+  .reason-item .num{
+    font-family: var(--sans);
+    font-size: 11px;
+    color: var(--gold);
+    min-width: 22px;
+    opacity: 0.7;
+  }
+  .reasons .last-line{
+    margin-top: 30px;
+    text-align:center;
+    font-family: var(--serif);
+    font-style: italic;
+    color: var(--rose-soft);
+    font-size: 20px;
+    opacity: 0;
+  }
+  .reasons .last-line.in{
+    animation: fadeUp 0.6s ease forwards;
+  }
+
+  .heart-burst{
+    position: fixed;
+    pointer-events: none;
+    z-index: 5;
+    font-size: 20px;
+    color: var(--rose);
+    animation: floatUp 1.4s ease-out forwards;
+  }
+  @keyframes floatUp{
+    0%{ opacity: 1; transform: translateY(0) scale(1); }
+    100%{ opacity: 0; transform: translateY(-120px) scale(1.4); }
+  }
+
+  footer{
+    margin-top: 60px;
+    font-size: 12px;
+    color: var(--rose-soft);
+    opacity: 0.4;
+    letter-spacing: 1px;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    * { animation: none !important; transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="canvas"></canvas>
+
+<div class="wrap" id="clickzone">
+  <div class="eyebrow">A small note for</div>
+  <h1>To my favorite person, <span class="name">Sara</span> —<br>you make everything better.</h1>
+  <p class="sub">Click the button. Every click after that is a reason. Click anywhere else for a little surprise.</p>
+  <button class="reveal-btn" id="revealBtn">Show me why</button>
+
+  <div class="reasons" id="reasons">
+    <div class="reason-item" data-i="0"><span class="num">01</span><span>The way you laugh at your own jokes before you even finish telling them.</span></div>
+    <div class="reason-item" data-i="1"><span class="num">02</span><span>You remember the tiny things I mention once — and bring them up weeks later.</span></div>
+    <div class="reason-item" data-i="2"><span class="num">03</span><span>Every ordinary day feels a little more interesting with you in it.</span></div>
+    <div class="reason-item" data-i="3"><span class="num">04</span><span>You believe in me on days I don't believe in myself.</span></div>
+    <div class="reason-item" data-i="4"><span class="num">05</span><span>Your texts are the best part of my day, every single time.</span></div>
+    <p class="last-line" data-i="5">I'm really glad it's you.</p>
+  </div>
+
+  <footer>click anywhere for hearts ✧</footer>
+</div>
+
+<script>
+  // ---------- ambient floating hearts on canvas ----------
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
+  let W, H;
+  function resize(){
+    W = canvas.width = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  const particles = [];
+  const PCOUNT = 26;
+  function makeParticle(){
+    return {
+      x: Math.random() * W,
+      y: H + Math.random() * 100,
+      size: 6 + Math.random() * 14,
+      speed: 0.3 + Math.random() * 0.6,
+      drift: (Math.random() - 0.5) * 0.6,
+      alpha: 0.15 + Math.random() * 0.35,
+      wobble: Math.random() * Math.PI * 2
+    };
+  }
+  for (let i = 0; i < PCOUNT; i++) particles.push(makeParticle());
+
+  function drawHeart(x, y, size, alpha){
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.translate(x, y);
+    ctx.scale(size / 20, size / 20);
+    ctx.beginPath();
+    ctx.moveTo(0, 6);
+    ctx.bezierCurveTo(0, 3, -6, -4, -12, 0);
+    ctx.bezierCurveTo(-18, 4, -12, 12, 0, 20);
+    ctx.bezierCurveTo(12, 12, 18, 4, 12, 0);
+    ctx.bezierCurveTo(6, -4, 0, 3, 0, 6);
+    ctx.closePath();
+    ctx.fillStyle = '#e8879a';
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function animate(){
+    ctx.clearRect(0, 0, W, H);
+    for (const p of particles){
+      p.y -= p.speed;
+      p.wobble += 0.02;
+      p.x += Math.sin(p.wobble) * p.drift;
+      if (p.y < -30){
+        Object.assign(p, makeParticle());
+        p.y = H + 20;
+      }
+      drawHeart(p.x, p.y, p.size, p.alpha);
+    }
+    requestAnimationFrame(animate);
+  }
+  animate();
+
+  // ---------- reveal reasons on button click ----------
+  const revealBtn = document.getElementById('revealBtn');
+  const reasons = document.getElementById('reasons');
+  let revealed = false;
+
+  revealBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (revealed) return;
+    revealed = true;
+    reasons.classList.add('show');
+    const items = reasons.querySelectorAll('.reason-item, .last-line');
+    items.forEach((el, i) => {
+      setTimeout(() => el.classList.add('in'), i * 350);
+    });
+    revealBtn.textContent = 'Every word is true';
+    revealBtn.disabled = true;
+    revealBtn.style.opacity = '0.6';
+    revealBtn.style.cursor = 'default';
+  });
+
+  // ---------- click-anywhere heart burst ----------
+  document.getElementById('clickzone').addEventListener('click', (e) => {
+    for (let i = 0; i < 6; i++){
+      const heart = document.createElement('div');
+      heart.className = 'heart-burst';
+      heart.textContent = '♥';
+      heart.style.left = (e.clientX + (Math.random() - 0.5) * 40) + 'px';
+      heart.style.top = (e.clientY + (Math.random() - 0.5) * 20) + 'px';
+      heart.style.fontSize = (14 + Math.random() * 16) + 'px';
+      document.body.appendChild(heart);
+      setTimeout(() => heart.remove(), 1500);
+    }
+  });
+</script>
+
+</body>
+</html>
