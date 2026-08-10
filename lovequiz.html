@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Us Quiz</title>
+<style>
+  :root{
+    --sky: #dbe9f4;
+    --sky-deep: #a9c9de;
+    --navy: #24384d;
+    --coral: #e07a5f;
+    --sun: #f2cc8f;
+    --white: #fffdf8;
+    --serif: 'Georgia', 'Iowan Old Style', serif;
+    --sans: 'Trebuchet MS', 'Segoe UI', sans-serif;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{
+    min-height:100%;
+    background: linear-gradient(180deg, var(--sky) 0%, var(--sky-deep) 100%);
+    font-family: var(--sans);
+    color: var(--navy);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding: 30px 16px;
+  }
+  .stage{
+    width: min(92vw, 480px);
+    background: var(--white);
+    border-radius: 20px;
+    padding: 36px 30px;
+    box-shadow: 0 30px 70px rgba(36,56,77,0.25);
+    position: relative;
+    overflow: hidden;
+  }
+  .stage::before{
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 160px; height: 160px;
+    background: var(--sun);
+    border-radius: 50%;
+    opacity: 0.35;
+  }
+  .eyebrow{
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--coral);
+    font-weight: 700;
+    margin-bottom: 8px;
+    position:relative;
+  }
+  h1{
+    font-family: var(--serif);
+    font-size: 26px;
+    margin-bottom: 24px;
+    position:relative;
+  }
+  .progress-dots{
+    display:flex;
+    gap: 6px;
+    margin-bottom: 26px;
+    position:relative;
+  }
+  .dot{
+    height: 6px;
+    flex:1;
+    background: rgba(36,56,77,0.12);
+    border-radius: 4px;
+    overflow:hidden;
+  }
+  .dot .fill{
+    height:100%;
+    width:0%;
+    background: var(--coral);
+    transition: width 0.4s ease;
+  }
+  .dot.done .fill{ width:100%; }
+  .dot.active .fill{ width:100%; }
+
+  .screen{ display:none; position:relative; }
+  .screen.active{ display:block; animation: slideIn 0.45s ease both; }
+  @keyframes slideIn{
+    from{ opacity:0; transform: translateX(24px); }
+    to{ opacity:1; transform: translateX(0); }
+  }
+
+  .question{
+    font-family: var(--serif);
+    font-size: 19px;
+    margin-bottom: 20px;
+    line-height: 1.4;
+  }
+  .options{
+    display:flex;
+    flex-direction:column;
+    gap: 10px;
+  }
+  .opt{
+    text-align:left;
+    background: rgba(36,56,77,0.04);
+    border: 1.5px solid transparent;
+    border-radius: 12px;
+    padding: 13px 16px;
+    font-size: 14.5px;
+    font-family: var(--sans);
+    color: var(--navy);
+    cursor: pointer;
+    transition: all 0.25s ease;
+  }
+  .opt:hover{
+    border-color: var(--coral);
+    background: rgba(224,122,95,0.08);
+  }
+  .opt.picked{
+    background: var(--coral);
+    color: var(--white);
+    border-color: var(--coral);
+  }
+  .opt:focus-visible{
+    outline: 2px solid var(--navy);
+    outline-offset: 2px;
+  }
+
+  .result-badge{
+    width: 78px; height: 78px;
+    border-radius: 50%;
+    background: var(--coral);
+    color: var(--white);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family: var(--serif);
+    font-size: 26px;
+    margin: 0 auto 18px;
+  }
+  .result-title{
+    font-family: var(--serif);
+    font-size: 24px;
+    text-align:center;
+    margin-bottom: 10px;
+  }
+  .result-body{
+    text-align:center;
+    font-size: 14.5px;
+    line-height: 1.6;
+    color: rgba(36,56,77,0.85);
+    margin-bottom: 22px;
+  }
+  .restart{
+    display:block;
+    margin: 0 auto;
+    background: var(--navy);
+    color: var(--white);
+    border: none;
+    padding: 12px 26px;
+    border-radius: 999px;
+    font-size: 13px;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: transform 0.25s ease, background 0.25s ease;
+  }
+  .restart:hover{
+    background: var(--coral);
+    transform: translateY(-2px);
+  }
+  @media (prefers-reduced-motion: reduce){
+    * { animation: none !important; transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="stage">
+  <div class="eyebrow">The Us Quiz</div>
+  <h1>How well do we know each other?</h1>
+  <div class="progress-dots" id="dots"></div>
+
+  <div id="quizArea"></div>
+
+  <div class="screen" id="resultScreen">
+    <div class="result-badge">✓</div>
+    <div class="result-title" id="resultTitle">We're a great match</div>
+    <div class="result-body" id="resultBody">Whatever the score, the answer was always going to be you. Every question, every day, every version of us — I'd pick this again.</div>
+    <button class="restart" id="restartBtn">Play again</button>
+  </div>
+</div>
+
+<script>
+  // ---- Edit questions/answers here to personalize ----
+  const questions = [
+    {
+      q: "Where was our first date?",
+      options: ["The little coffee shop downtown", "That noisy street food stall", "Nowhere fancy, just a walk", "I genuinely forget, oops"],
+      correct: 0
+    },
+    {
+      q: "What do I always order without thinking twice?",
+      options: ["Whatever you're having", "The spiciest thing on the menu", "Something sweet, always", "I panic and pick randomly"],
+      correct: 2
+    },
+    {
+      q: "What's my go-to way to cheer you up?",
+      options: ["Send a dumb meme", "Call you out of nowhere", "Show up with your favorite snack", "All of the above, honestly"],
+      correct: 3
+    },
+    {
+      q: "What's one thing I say too often?",
+      options: ["\"I'm on my way\"", "\"Have you eaten?\"", "\"One more episode\"", "\"I miss you already\""],
+      correct: 1
+    }
+  ];
+  // ------------------------------------------------------
+
+  const quizArea = document.getElementById('quizArea');
+  const dotsWrap = document.getElementById('dots');
+  const resultScreen = document.getElementById('resultScreen');
+  const resultTitle = document.getElementById('resultTitle');
+  const resultBody = document.getElementById('resultBody');
+  const restartBtn = document.getElementById('restartBtn');
+
+  let current = 0;
+  let score = 0;
+  let locked = false;
+
+  function buildDots(){
+    dotsWrap.innerHTML = '';
+    questions.forEach((_, i) => {
+      const d = document.createElement('div');
+      d.className = 'dot';
+      d.innerHTML = '<div class="fill"></div>';
+      dotsWrap.appendChild(d);
+    });
+  }
+
+  function renderQuestion(){
+    locked = false;
+    const item = questions[current];
+    const screen = document.createElement('div');
+    screen.className = 'screen active';
+    screen.innerHTML = `
+      <div class="question">${item.q}</div>
+      <div class="options">
+        ${item.options.map((opt, i) => `<button class="opt" data-i="${i}">${opt}</button>`).join('')}
+      </div>
+    `;
+    quizArea.innerHTML = '';
+    quizArea.appendChild(screen);
+
+    // update dots
+    const dots = dotsWrap.querySelectorAll('.dot');
+    dots.forEach((d, i) => {
+      d.classList.toggle('done', i < current);
+      d.classList.toggle('active', i === current);
+    });
+
+    screen.querySelectorAll('.opt').forEach(btn => {
+      btn.addEventListener('click', () => handleAnswer(btn, item));
+    });
+  }
+
+  function handleAnswer(btn, item){
+    if (locked) return;
+    locked = true;
+    const i = parseInt(btn.dataset.i, 10);
+    btn.classList.add('picked');
+    if (i === item.correct) score++;
+
+    setTimeout(() => {
+      current++;
+      if (current < questions.length){
+        renderQuestion();
+      } else {
+        showResult();
+      }
+    }, 500);
+  }
+
+  function showResult(){
+    quizArea.innerHTML = '';
+    const dots = dotsWrap.querySelectorAll('.dot');
+    dots.forEach(d => d.classList.add('done'));
+
+    const pct = Math.round((score / questions.length) * 100);
+    let title, body;
+    if (pct === 100){
+      title = "100% — you know everything";
+      body = "Every single answer, right. That's either a great memory or a lot of attention paid to me — I'll take either.";
+    } else if (pct >= 50){
+      title = `${pct}% — pretty solid`;
+      body = "Not bad at all. A few little things to learn about each other still, and honestly, I like that we still get to.";
+    } else {
+      title = `${pct}% — plenty to learn`;
+      body = "Okay, we clearly need more inside jokes and more time together. Consider this an excuse for another date.";
+    }
+    resultTitle.textContent = title;
+    resultBody.textContent = body;
+    resultScreen.classList.add('active');
+  }
+
+  restartBtn.addEventListener('click', () => {
+    current = 0;
+    score = 0;
+    resultScreen.classList.remove('active');
+    buildDots();
+    renderQuestion();
+  });
+
+  buildDots();
+  renderQuestion();
+</script>
+
+</body>
+</html>
